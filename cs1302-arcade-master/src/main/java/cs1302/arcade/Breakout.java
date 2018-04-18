@@ -1,11 +1,12 @@
 package cs1302.arcade;
 
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.Group;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
@@ -13,12 +14,24 @@ public class Breakout extends Application{
 	
 	int rows = 8;
 	int cols = 8;
-
+	
 	public void start(Stage stage) {
-		//adfasdf
-		Group group = new Group(); //main container
-		Rectangle rect = new Rectangle(816, 516); //black background
-		HBox hbox1 = new HBox();
+		
+		Group group = new Group();
+		Scene scene = new Scene(group);
+		Rectangle background = new Rectangle(816, 516, Color.BLACK);
+		
+		
+		HBox data = new HBox();
+		Label level = new Label("Level: \t");
+		level.setTextFill(Color.WHITE);
+		Label lives = new Label("Lives: \t");
+		lives.setTextFill(Color.WHITE);
+		Label score = new Label("Score: ");
+		score.setTextFill(Color.WHITE);
+		data.getChildren().addAll(level, lives, score);
+		
+		
 		FlowPane fp = new FlowPane();
 		fp.setPrefWrapLength(816);
 		Rectangle [][] bricks = new Rectangle[rows][cols];
@@ -38,23 +51,44 @@ public class Breakout extends Application{
 				fp.setVgap(2);
 			}
 		
-		Label level = new Label("Level: \t");
-		level.setTextFill(Color.WHITE);
 		
-		Label lives = new Label("Lives: \t");
-		lives.setTextFill(Color.WHITE);
-		
-		Label score = new Label("Score: ");
-		score.setTextFill(Color.WHITE);
-		
-		hbox1.getChildren().addAll(level, lives, score);
-		group.getChildren().addAll(rect, hbox1, fp);  
+		Paddle paddle = new Paddle(100, 20, Color.WHITE);
+		paddle.setX(400);
+		paddle.setY(408);
+		Ball ball = new Ball(7, Color.WHITE);
+		ball.setCenterX(350);
+		ball.setCenterY(380);
+		group.getChildren().addAll(background, data, fp, paddle, ball);
 		
 		
-		Scene scene = new Scene(group);
+		// when the user presses left and right, move the rectangle
+		scene.setOnKeyPressed(e -> {
+			if(paddle.getX() == 0) {
+				if (e.getCode() == KeyCode.LEFT)  
+					paddle.setX(paddle.getX());
+				if (e.getCode() == KeyCode.RIGHT) 
+					paddle.setX(paddle.getX() + 10.0);
+			}
+			else if(paddle.getX() >= 716) {
+				if (e.getCode() == KeyCode.LEFT)  
+					paddle.setX(paddle.getX() - 10.0);
+				if (e.getCode() == KeyCode.RIGHT) 
+					paddle.setX(paddle.getX());
+			}
+			else{
+				if (e.getCode() == KeyCode.LEFT)  
+					paddle.setX(paddle.getX() - 10.0);
+				if (e.getCode() == KeyCode.RIGHT) 
+					paddle.setX(paddle.getX() + 10.0);
+			}
+		});
+		
+		
         stage.setTitle("Breakout");
         stage.setMinHeight(516);
         stage.setMinWidth(816);
+        stage.setMaxHeight(516);
+        stage.setMaxWidth(816);
         stage.setScene(scene);
         stage.sizeToScene();
         stage.show();
