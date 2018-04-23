@@ -4,16 +4,23 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.Group;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+import javafx.scene.paint.*;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.scene.text.*;
+import javafx.util.Duration;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 
 public class Breakout extends Application{
 	
 	int rows = 8;
 	int cols = 8;
+	Integer score = 0;
 	
 	public void start(Stage stage) {
 		
@@ -23,64 +30,53 @@ public class Breakout extends Application{
 		
 		
 		HBox data = new HBox();
-		Label level = new Label("Level: \t");
+		
+		Label level = new Label("Level: \t\t");
 		level.setTextFill(Color.WHITE);
-		Label lives = new Label("Lives: \t");
+		
+		Label lives = new Label("Lives: \t\t");
 		lives.setTextFill(Color.WHITE);
-		Label score = new Label("Score: ");
-		score.setTextFill(Color.WHITE);
-		data.getChildren().addAll(level, lives, score);
+		
+		Label scoring = new Label("Score: ");
+		scoring.setTextFill(Color.WHITE);
+		
+		Text score = new Text("0");
+		score.setFill(Color.WHITE);
+		
+		data.getChildren().addAll(level, lives, scoring, score);
 		
 		
 		FlowPane fp = new FlowPane();
+		fp.setHgap(2);
+		fp.setVgap(2);
 		fp.setPrefWrapLength(816);
-		Rectangle [][] bricks = new Rectangle[rows][cols];
-		for(int r = 0; r < rows; r++)
+		
+		Brick [][] bricks = new Brick[rows][cols];
+		for(int r = 0; r < rows; r++) {
 			for(int c = 0; c < cols; c++) {
-				bricks[r][c] = new Rectangle(100, 20);
-				if(r == 0 || r == 1)
-					bricks[r][c].setFill(Color.RED);
-				if(r == 2 || r == 3)
-					bricks[r][c].setFill(Color.ORANGE);
-				if(r == 4 || r == 5)
-					bricks[r][c].setFill(Color.LAWNGREEN);
-				if(r == 6 || r == 7)
-					bricks[r][c].setFill(Color.YELLOW);
+				bricks[r][c] = new Brick(100, 20);
+				bricks[r][c].setColor(r);
 				fp.getChildren().add(bricks[r][c]);
-				fp.setHgap(2);
-				fp.setVgap(2);
-			}
+			}//for
+		}//for
 		
 		
 		Paddle paddle = new Paddle(100, 20, Color.WHITE);
 		paddle.setX(400);
-		paddle.setY(408);
+		paddle.setY(440);
 		Ball ball = new Ball(7, Color.WHITE);
 		ball.setCenterX(350);
 		ball.setCenterY(380);
-		group.getChildren().addAll(background, data, fp, paddle, ball);
+		group.getChildren().addAll(background, fp, paddle, ball, data);
 		
 		
 		// when the user presses left and right, move the rectangle
 		scene.setOnKeyPressed(e -> {
-			if(paddle.getX() == 0) {
-				if (e.getCode() == KeyCode.LEFT)  
-					paddle.setX(paddle.getX());
-				if (e.getCode() == KeyCode.RIGHT) 
-					paddle.setX(paddle.getX() + 10.0);
-			}
-			else if(paddle.getX() >= 716) {
-				if (e.getCode() == KeyCode.LEFT)  
-					paddle.setX(paddle.getX() - 10.0);
-				if (e.getCode() == KeyCode.RIGHT) 
-					paddle.setX(paddle.getX());
-			}
-			else{
-				if (e.getCode() == KeyCode.LEFT)  
-					paddle.setX(paddle.getX() - 10.0);
-				if (e.getCode() == KeyCode.RIGHT) 
-					paddle.setX(paddle.getX() + 10.0);
-			}
+			
+			paddle.move(e);
+			if(e.getCode() == KeyCode.SPACE)
+				ball.move(paddle, bricks);
+
 		});
 		
 		
@@ -94,6 +90,23 @@ public class Breakout extends Application{
         stage.show();
         
 	}//start
+	
+	
+	public Integer updateScore(Color color) {
+		
+		if(color.equals(Color.YELLOW))
+			score = score + 1;
+		if(color.equals(Color.LAWNGREEN))
+			score = score + 3;
+		if(color.equals(Color.ORANGE))
+			score = score + 5;
+		if(color.equals(Color.RED))
+			score = score + 7;
+		
+		return score;
+		
+	}//updateScore
+	
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -109,4 +122,4 @@ public class Breakout extends Application{
 
 	}//main
 
-}
+}//Breakout
